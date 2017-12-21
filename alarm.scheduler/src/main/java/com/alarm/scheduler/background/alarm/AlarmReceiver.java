@@ -8,6 +8,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.alarm.scheduler.BuildConfig;
 import com.alarm.scheduler.db.model.Alarm;
+import com.alarm.scheduler.manager.SettingsManager;
 import com.alarm.scheduler.tools.WakeLocker;
 
 import java.util.Date;
@@ -25,11 +26,14 @@ public class AlarmReceiver extends BroadcastReceiver{
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        WakeLocker.acquire(context);
-
-        notify(context, intent, true);
-
-        WakeLocker.release();
+        SettingsManager settingsManager = SettingsManager.getInstance(context);
+        if (settingsManager.wakeScreen()){
+            WakeLocker.acquire(context);
+            notify(context, intent, settingsManager.showNotification());
+            WakeLocker.release();
+        }else{
+            notify(context, intent, settingsManager.showNotification());
+        }
     }
 
     private void notify(Context context, Intent intent, boolean showStatus){

@@ -1,7 +1,6 @@
 package com.alarm.scheduler.background.bootup;
 
 import android.app.IntentService;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 
@@ -32,10 +31,7 @@ public class AlarmBootUpService extends IntentService {
                     .query();
 
             for (Alarm alarm : alarms) {
-                Intent i = scheduleManager.createIntent(getApplicationContext(), alarm);
-                PendingIntent pIntent = PendingIntent.getBroadcast(this, alarm.getId(), i, 0);
-
-                scheduleManager.scheduleAlarm(getApplicationContext(), alarm, pIntent);
+                scheduleManager.scheduleAlarm(getApplicationContext(), alarm);
             }
         } catch (SQLException e) {
             e.printStackTrace();
