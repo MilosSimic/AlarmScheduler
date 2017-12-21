@@ -17,7 +17,5 @@ public class AlarmContract {
     public static final String ALARM_MESSAGE = "message";
 
     public static final String APP_TAG = "com.alarm.scheduler.AlarmScheduler";
-    public static final String WAKE_UP_ACTIVITY = "WAKE_UP_ACTIVITY";
-    public static final String WAKE_UP_ACTIVITY_PACKAGE = "WAKE_UP_ACTIVITY_PACKAGE";
 
 }

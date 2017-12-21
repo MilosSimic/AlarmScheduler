@@ -27,34 +27,33 @@ public class AlarmReceiver extends BroadcastReceiver{
     @Override
     public void onReceive(Context context, Intent intent) {
         SettingsManager settingsManager = SettingsManager.getInstance(context);
+
         if (settingsManager.wakeScreen()){
             WakeLocker.acquire(context);
-            notify(context, intent, settingsManager.showNotification());
+            notify(context, intent, settingsManager);
             WakeLocker.release();
         }else{
-            notify(context, intent, settingsManager.showNotification());
+            notify(context, intent, settingsManager);
         }
     }
 
-    private void notify(Context context, Intent intent, boolean showStatus){
+    private void notify(Context context, Intent intent, SettingsManager settingsManager){
         int alarm_id = intent.getIntExtra(ALARM_ID, -1);
         int alarm_type = intent.getIntExtra(ALARM_TYPE, -1);
         String alarm_time = intent.getStringExtra(ALARM_TIME);
 
-        if (showStatus) {
+        if (settingsManager.showNotification()) {
             prepareNotification(context, alarm_id, alarm_type, alarm_time);
         }
-        startMyActivity(context, alarm_id, alarm_type, alarm_time);
+
+        startMyActivity(context, alarm_id, settingsManager.getWakeUpScreen());
     }
 
-    private void startMyActivity(Context context, int alarmId, int alarmType, String alarmTime){
-        //Intent i = new Intent(context, WakeUpActivity.class);
+    private void startMyActivity(Context context, int alarmId, String wakUpScreen){
         Intent i = new Intent();
-        i.setClassName(BuildConfig.APPLICATION_ID, "com.proto.io.ui.WakeUpActivity");
+        i.setClassName(BuildConfig.APPLICATION_ID, wakUpScreen);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         i.putExtra(ALARM_ID, alarmId);
-        i.putExtra(ALARM_TYPE, alarmType);
-        i.putExtra(ALARM_TIME, alarmTime);
         context.startActivity(i);
     }
 

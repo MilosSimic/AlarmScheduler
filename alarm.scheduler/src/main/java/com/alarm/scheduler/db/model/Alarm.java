@@ -15,7 +15,6 @@ public class Alarm {
     public static final int WEEKLY_ALARM = 1000;      //interval of 7 days Monday 1st to Monday 8th
     public static final int EVERY_DAY_ALARM = 2000; //interval of 1 day including Saturday and Sunday
     public static final int WEEKDAY_ALARM = 3000;   //interval of 1 day exclude Saturday and Sunday
-    public static final int ONE_TIME_ALARM = 4000; //single time alarms
 
     @DatabaseField(generatedId = true, columnName = AlarmContract.ALARM_ID)
     private int id;
