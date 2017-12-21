@@ -1,0 +1,87 @@
+package com.alarm.scheduler.background.alarm;
+
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
+
+import com.alarm.scheduler.BuildConfig;
+import com.alarm.scheduler.db.model.Alarm;
+import com.alarm.scheduler.tools.WakeLocker;
+
+import java.util.Date;
+import java.util.Locale;
+
+import static com.alarm.scheduler.db.contract.AlarmContract.ALARM_ID;
+import static com.alarm.scheduler.db.contract.AlarmContract.ALARM_TIME;
+import static com.alarm.scheduler.db.contract.AlarmContract.ALARM_TYPE;
+
+/**
+ * Created by milossimic on 12/19/17.
+ */
+
+public class AlarmReceiver extends BroadcastReceiver{
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        WakeLocker.acquire(context);
+
+        notify(context, intent, true);
+
+        WakeLocker.release();
+    }
+
+    private void notify(Context context, Intent intent, boolean showStatus){
+        int alarm_id = intent.getIntExtra(ALARM_ID, -1);
+        int alarm_type = intent.getIntExtra(ALARM_TYPE, -1);
+        String alarm_time = intent.getStringExtra(ALARM_TIME);
+
+        if (showStatus) {
+            prepareNotification(context, alarm_id, alarm_type, alarm_time);
+        }
+        startMyActivity(context, alarm_id, alarm_type, alarm_time);
+    }
+
+    private void startMyActivity(Context context, int alarmId, int alarmType, String alarmTime){
+        //Intent i = new Intent(context, WakeUpActivity.class);
+        Intent i = new Intent();
+        i.setClassName(BuildConfig.APPLICATION_ID, "com.proto.io.ui.WakeUpActivity");
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        i.putExtra(ALARM_ID, alarmId);
+        i.putExtra(ALARM_TYPE, alarmType);
+        i.putExtra(ALARM_TIME, alarmTime);
+        context.startActivity(i);
+    }
+
+    private void prepareNotification(Context context, int alarmId, int alarmType, String alarmTime){
+        NotificationManager mNotificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
+
+        String atypeSTR = "";
+
+        switch (alarmType){
+            case Alarm.EVERY_DAY_ALARM:
+                atypeSTR = "EVERY_DAY_ALARMS";
+                break;
+            case Alarm.WEEKDAY_ALARM:
+                atypeSTR = "WEEKDAY_ALARMS";
+                break;
+            default:
+                atypeSTR = "WEEKLY_ALARMS";
+
+        }
+
+        String data = String.format(Locale.US,"time:%s type:%s alarm:%d", alarmTime, atypeSTR, alarmId);
+
+        mBuilder.setSmallIcon(android.R.drawable.ic_btn_speak_now);
+        mBuilder.setContentTitle("Simple alarm");
+        mBuilder.setContentText(data);
+
+        int m = (int) ((new Date().getTime() / 1000L) % Integer.MAX_VALUE);
+        if (mNotificationManager != null) {
+            // notificationID allows you to update the notification later on.
+            mNotificationManager.notify(m, mBuilder.build());
+        }
+    }
+}

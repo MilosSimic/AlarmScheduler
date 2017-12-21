@@ -1,0 +1,17 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.alarm.scheduler" >
+
+    <application>
+        <receiver android:enabled="true" android:name=".background.bootup.AlarmBootUpReceiver"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".background.alarm.AlarmReceiver" />
+
+        <service android:name=".background.bootup.AlarmBootUpService" />
+    </application>
+</manifest>
